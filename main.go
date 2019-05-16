@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	timezone "github.com/evanoberholster/timezoneLookup"
@@ -17,6 +16,7 @@ func main() {
 
 	logMiddleware := logger.BuildMiddleware(log)
 
+	log.Info("Begin to load Timezone Database")
 	tzService, err := timezone.LoadTimezones(timezone.Config{
 		DatabaseType: "memory",
 		DatabaseName: "assets/timezone",
@@ -24,12 +24,13 @@ func main() {
 	})
 
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
+	defer tzService.Close()
 	log.Info("Init Timezone Database")
 
 	// build handlers for routes
-	tzHandler := handlers.TimezoneHandler(tzService)
+	tzHandler := handlers.TimezoneHandler(tzService, log)
 	statusHandler := handlers.StatusHandler()
 
 	r := mux.NewRouter()
