@@ -3,10 +3,10 @@ package main
 import (
 	"net/http"
 
-	timezone "github.com/evanoberholster/timezoneLookup"
 	"github.com/gorilla/mux"
 	"racemap.com/tz-service/handlers"
 	"racemap.com/tz-service/logger"
+	"racemap.com/tz-service/timezones"
 )
 
 func main() {
@@ -17,11 +17,7 @@ func main() {
 	logMiddleware := logger.BuildMiddleware(log)
 
 	log.Info("Begin to load Timezone Database")
-	tzService, err := timezone.LoadTimezones(timezone.Config{
-		DatabaseType: "memory",
-		DatabaseName: "assets/timezone",
-		Snappy:       true,
-	})
+	tzService, err := timezones.InitTimezoneService()
 
 	if err != nil {
 		panic(err)

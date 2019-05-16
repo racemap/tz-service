@@ -27,7 +27,7 @@ func TimezoneHandler(tz timezone.TimezoneInterface, log *logrus.Logger) func(w h
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprint(w, "Input coordinates have wrong format. Plaese deliver as float number.")
+			fmt.Fprint(w, "Input coordinates have wrong format. Plaese deliver as float number. For example /api?lng=52.517932&lat=13.402992")
 			return
 		}
 
