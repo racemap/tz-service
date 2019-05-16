@@ -38,7 +38,7 @@ func main() {
 
 	http.Handle("/", r)
 
-	var port = "8000"
+	var port = "8080"
 
 	log.Info("Start HTTP Server on Port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, r))

@@ -34,6 +34,7 @@ func TimezoneHandler(tz timezone.TimezoneInterface, log *logrus.Logger) func(w h
 		tzInfos, err := getTimezoneInfos(lat, lng, tz)
 
 		if err != nil {
+			log.Error("Failed to find timezone for a request:", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Failed to find timezone for your request.")
 			return
@@ -43,6 +44,7 @@ func TimezoneHandler(tz timezone.TimezoneInterface, log *logrus.Logger) func(w h
 		w.Header().Set("Content-Type", "application/json")
 
 		if err := json.NewEncoder(w).Encode(tzInfos); err != nil {
+			log.Error("Failed to build valid response:", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprint(w, "Failed to build valid response.")
 			return
