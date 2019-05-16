@@ -32,6 +32,6 @@ Or you use docker. Then you can change in the project folder and call `docker bu
 
 ## TODO:
 
-[ ] Better documentation
-[ ] Tests
+- [ ] Better documentation
+- [ ] Tests
 
