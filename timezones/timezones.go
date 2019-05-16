@@ -14,8 +14,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var assetPath = "assets"
+var buildDatabasePath = assetPath + "/timezone.snap.json"
+var rawDatabasePath = assetPath + "/timezones-with-oceans.geojson"
+var zipPath = assetPath + "/timezones-with-oceans.geojson.zip"
+
 func InitTimezoneService() (timezoneLookup.TimezoneInterface, error) {
-	_, err := os.Stat("assets/timezone.snap.json")
+	_, err := os.Stat(buildDatabasePath)
 
 	if os.IsNotExist(err) {
 		return rebuildDatabase()
@@ -32,13 +37,18 @@ func InitTimezoneService() (timezoneLookup.TimezoneInterface, error) {
 
 func rebuildDatabase() (timezoneLookup.TimezoneInterface, error) {
 	log.Info("Found no database. Rebuild the database.")
-	if _, err := os.Stat("assets/timezones-with-oceans.geojson"); err != nil {
+	if err := os.MkdirAll(assetPath, os.ModePerm); err != nil {
+		log.Error("Failed to build assets folder.")
+		panic(err)
+	}
+
+	if _, err := os.Stat(rawDatabasePath); err != nil {
 		log.Info("Found no shape files to build new database.")
 		err = reloadShapeFiles()
 	}
 
 	tz := timezoneLookup.MemoryStorage(true, "assets/timezone")
-	if err := tz.CreateTimezones("assets/combined-with-oceans.json"); err != nil {
+	if err := tz.CreateTimezones(rawDatabasePath); err != nil {
 		return nil, err
 	}
 
@@ -46,8 +56,8 @@ func rebuildDatabase() (timezoneLookup.TimezoneInterface, error) {
 }
 
 func reloadShapeFiles() error {
-	if _, err := os.Stat("assets/timezones-with-oceans.geojson.zip"); os.IsNotExist(err) {
-		if err := downloadGeoJSON("assets/timezones-with-oceans.geojson.zip"); err != nil {
+	if _, err := os.Stat(zipPath); os.IsNotExist(err) {
+		if err := downloadGeoJSON(zipPath); err != nil {
 			log.Error("Failed to load the basic shape files from github.")
 			panic(err)
 		}
@@ -64,8 +74,8 @@ func reloadShapeFiles() error {
 }
 
 func unzipShapeFiles() error {
-	src := "assets/timezones-with-oceans.geojson.zip"
-	dest := "assets"
+	src := zipPath
+	dest := assetPath
 
 	r, err := zip.OpenReader(src)
 	if err != nil {
@@ -84,7 +94,7 @@ func unzipShapeFiles() error {
 		}
 
 		if f.Name == "dist/combined-with-oceans.json" {
-			outPath := "assets/combined-with-oceans.json"
+			outPath := rawDatabasePath
 
 			outFile, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 			if err != nil {
