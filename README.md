@@ -5,7 +5,7 @@
 Small webserver, that can deliver Timezone Informations for coordinates. For example you can request this resource: 
 
 ```
-http://localhost:8080/api?lng=52.517932&lat=13.402992"
+http://localhost:8080/api?lng=52.517932&lat=13.402992
 ```
 
 The service response with a json:
