@@ -10,6 +10,20 @@ jobs:
           command: docker build -t "racemap/tz-service:${CIRCLE_BUILD_NUM}" .
 
       - run:
+          name: Run local tests
+          command: |
+            docker run \
+              --rm \
+              -d \
+              -p8080:8080 \
+              --name tz-service \
+              "racemap/tz-service:${CIRCLE_BUILD_NUM}"
+            sleep 10
+            RESULT=$(curl "http://localhost:8080/api?lng=32.408843&lat=104.505033")
+            [ "$RESULT" = "{\"name\":\"Asia/Shanghai\",\"id\":\"CST\",\"offset\":28800}" ]
+            docker stop tz-service
+
+      - run:
           name: Push Docker images
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin

@@ -2,25 +2,27 @@
 
 ## Description:
 
-Small webserver, that can deliver Timezone Informations for coordinates. For example you can request this resource: 
+Small webserver, that can deliver Timezone Informations for coordinates. For example you can request this resource:
 
 ```
-http://localhost:8080/api?lng=52.517932&lat=13.402992"
+http://localhost:8080/api?lng=52.517932&lat=13.402992
 ```
 
 The service response with a json:
 
 ```json
 {
-    "name": "Europe/Berlin",
-    "id": "CEST",
-    "offset": 7200
+  "name": "Europe/Berlin",
+  "id": "CEST",
+  "offset": 7200
 }
 ```
 
+The name is the common name for the timezone and the id the short identifier. The offset is the differenc in seconds to utc.
+
 ## Thanks to:
 
-This project use the work of two awesome projects. [evanoberholster/timezoneLookup](https://github.com/evanoberholster/timezoneLookup) is go library that find the timezone for a coordinate. This project use the shapefile of this project [evansiroky/timezone-boundary-builder](https://github.com/evansiroky/timezone-boundary-builder). 
+This project use the work of two awesome projects. [evanoberholster/timezoneLookup](https://github.com/evanoberholster/timezoneLookup) is go library that find the timezone for a coordinate. This project use the shapefile of this project [evansiroky/timezone-boundary-builder](https://github.com/evansiroky/timezone-boundary-builder).
 
 ## How to use:
 
@@ -32,6 +34,5 @@ Or you use docker. Then you can change in the project folder and call `docker bu
 
 ## TODO:
 
-- [ ] Better documentation
+- [x] Better documentation
 - [ ] Tests
-
