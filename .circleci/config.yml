@@ -1,0 +1,33 @@
+version: 2
+jobs:
+  build_test_deploy:
+    machine: true
+    steps:
+      - checkout
+
+      - run:
+          name: Build docker container
+          command: docker build -t "racemap/tz-service:${CIRCLE_BUILD_NUM}" .
+
+      - run:
+          name: Push Docker images
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker tag \
+              "racemap/tz-service:${CIRCLE_BUILD_NUM}" \
+              "racemap/tz-service:${CIRCLE_BRANCH}"
+            docker push "racemap/tz-service:${CIRCLE_BUILD_NUM}"
+            docker push "racemap/tz-service:${CIRCLE_BRANCH}"
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker tag \
+                "racemap/tz-service:${CIRCLE_BUILD_NUM}" \
+                "racemap/tz-service:latest"
+              docker push "racemap/tz-service:latest"
+            fi
+            docker logout
+
+workflows:
+  version: 2
+  default:
+    jobs:
+      - build_test_deploy
