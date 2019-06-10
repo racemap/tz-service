@@ -35,8 +35,3 @@ If you want to build the container yourself, change to the project folder and ru
 ## Thanks to
 
 This project use the work of two awesome projects. [evanoberholster/timezoneLookup](https://github.com/evanoberholster/timezoneLookup) is go library that find the timezone for a coordinate. This project use the shapefile of this project [evansiroky/timezone-boundary-builder](https://github.com/evansiroky/timezone-boundary-builder).
-
-## TODO
-
-- [x] Better documentation
-- [ ] Tests
