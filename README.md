@@ -18,7 +18,7 @@ The service response with a json:
 }
 ```
 
-The name is the common name for the timezone and the id the short identifier. The offset is the differenc in seconds to utc.
+`name` is the common name for the timezone. `id` is the short identifier. `offset` is the difference in seconds to UTC.
 
 ## Thanks to:
 
