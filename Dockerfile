@@ -17,11 +17,13 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
-# final stage 
-FROM scratch
+# final stage
+FROM alpine:3.9
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /app/tz-service /app/
 COPY --from=builder /etc/ssl/certs/* /etc/ssl/certs/
+
+RUN apk add --update --no-cache curl
 
 HEALTHCHECK CMD curl --fail "http://localhost:8080/api?lng=52.517932&lat=13.402992" || exit 1
 
