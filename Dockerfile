@@ -23,5 +23,8 @@ COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /app/tz-service /app/
 COPY --from=builder /etc/ssl/certs/* /etc/ssl/certs/
 
+HEALTHCHECK CMD curl --fail "http://localhost:8080/api?lng=52.517932&lat=13.402992" || exit 1
+
 EXPOSE 8080
+
 ENTRYPOINT ["/app/tz-service"]
