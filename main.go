@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	gorillaHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"racemap.com/tz-service/handlers"
 	"racemap.com/tz-service/logger"
@@ -41,7 +42,7 @@ func main() {
 	var port = "8080"
 
 	log.Info("Start HTTP Server on Port " + port)
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	log.Fatal(http.ListenAndServe(":"+port, gorillaHandlers.CORS()(r)))
 
 	log.Info("Stopped Server")
 }
