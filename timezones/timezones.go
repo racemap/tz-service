@@ -2,9 +2,11 @@ package timezones
 
 import (
 	"archive/zip"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -124,7 +126,13 @@ func unzipShapeFiles() error {
 // DownloadFile will download a url to a local file.
 func downloadGeoJSON(filepath string) error {
 	log.Info("Start to download basic shape files.")
-	url := "https://github.com/evansiroky/timezone-boundary-builder/releases/download/2019a/timezones-with-oceans.geojson.zip"
+	url := "https://github.com/evansiroky/timezone-boundary-builder/releases/download/2020d/timezones-with-oceans.geojson.zip"
+
+	// Set latest URL when we have it, fallback is hardcoded
+	latestUrl, err := latestReleaseAssetUrl("evansiroky/timezone-boundary-builder", "github.com/racemap/tz-service", "timezones-with-oceans.geojson.zip")
+	if err == nil {
+		url = latestUrl
+	}
 
 	// Get the data
 	resp, err := http.Get(url)
@@ -143,4 +151,50 @@ func downloadGeoJSON(filepath string) error {
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+func latestReleaseAssetUrl(repo string, userAgent string, assetName string) (string, error) {
+	request, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/"+repo+"/releases/latest", nil)
+	if err != nil {
+		return "", err
+	}
+	request.Header.Set("User-Agent", userAgent)
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return "", err
+	}
+
+	if response.Body != nil {
+		defer response.Body.Close()
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	type Asset struct {
+		Name string `json:"name"`
+		Url  string `json:"browser_download_url"`
+	}
+
+	type Release struct {
+		Assets []Asset
+	}
+
+	release := Release{}
+	err = json.Unmarshal(body, &release)
+	if err != nil {
+		return "", err
+	}
+
+	for i := 0; i < len(release.Assets); i++ {
+		if assetName == release.Assets[i].Name {
+			return release.Assets[i].Url, nil
+		}
+	}
+
+	return "", errors.New("No asset found")
 }
