@@ -7,7 +7,7 @@ jobs:
 
       - run:
           name: Build docker container
-          command: docker build -t "racemap/tz-service:${CIRCLE_BUILD_NUM}" .
+          command: docker build --target app -t "racemap/tz-service:${CIRCLE_BUILD_NUM}" .
 
       - run:
           name: Run local tests
@@ -24,19 +24,32 @@ jobs:
             docker stop tz-service
 
       - run:
+          name: Build docker container with assets
+          command: docker build --target app_with_assets -t "racemap/tz-service:${CIRCLE_BUILD_NUM}-assets" .
+
+      - run:
           name: Push Docker images
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             docker tag \
               "racemap/tz-service:${CIRCLE_BUILD_NUM}" \
               "racemap/tz-service:${CIRCLE_BRANCH}"
+            docker tag \
+              "racemap/tz-service:${CIRCLE_BUILD_NUM}-assets" \
+              "racemap/tz-service:${CIRCLE_BRANCH}-assets"
             docker push "racemap/tz-service:${CIRCLE_BUILD_NUM}"
             docker push "racemap/tz-service:${CIRCLE_BRANCH}"
+            docker push "racemap/tz-service:${CIRCLE_BUILD_NUM}-assets"
+            docker push "racemap/tz-service:${CIRCLE_BRANCH}-assets"
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker tag \
                 "racemap/tz-service:${CIRCLE_BUILD_NUM}" \
                 "racemap/tz-service:latest"
               docker push "racemap/tz-service:latest"
+              docker tag \
+                "racemap/tz-service:${CIRCLE_BUILD_NUM}-assets" \
+                "racemap/tz-service:latest-assets"
+              docker push "racemap/tz-service:latest-assets"
             fi
             docker logout
 

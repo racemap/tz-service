@@ -17,8 +17,10 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
+RUN /app/tz-service init
+
 # final stage
-FROM alpine:3.9
+FROM alpine:3.9 AS app
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /app/tz-service /app/
 COPY --from=builder /etc/ssl/certs/* /etc/ssl/certs/
@@ -29,4 +31,9 @@ HEALTHCHECK CMD curl --fail "http://localhost:8080/api?lng=52.517932&lat=13.4029
 
 EXPOSE 8080
 
+WORKDIR /app
+
 ENTRYPOINT ["/app/tz-service"]
+
+FROM app AS app_with_assets
+COPY --from=builder /app/assets/timezone.snap.json /app/assets/
