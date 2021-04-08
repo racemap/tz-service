@@ -71,7 +71,7 @@ jobs:
             -d \
             -p8080:8080 \
             --name tz-service \
-            "racemap/tz-service:${GITHUB_RUN_NUMBER}"
+            "racemap/tz-service:${GITHUB_RUN_NUMBER}-assets"
           sleep 30
           RESULT=$(curl "http://localhost:8080/api?lng=32.408843&lat=104.505033")
           [ "$RESULT" = "{\"name\":\"Asia/Shanghai\",\"id\":\"CST\",\"offset\":28800}" ]
