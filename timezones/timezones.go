@@ -24,6 +24,9 @@ var zipPath = assetPath + "/timezones-with-oceans.geojson.zip"
 func InitTimezoneService() (timezoneLookup.TimezoneInterface, error) {
 	_, err := os.Stat(buildDatabasePath)
 
+	// TODO: write a json with infos which version of the timezones are stored and
+	// to request a update if the version of the timezones is old
+
 	if os.IsNotExist(err) {
 		return rebuildDatabase()
 	}
@@ -46,7 +49,9 @@ func rebuildDatabase() (timezoneLookup.TimezoneInterface, error) {
 
 	if _, err := os.Stat(rawDatabasePath); err != nil {
 		log.Info("Found no shape files to build new database.")
-		err = reloadShapeFiles()
+		if err := reloadShapeFiles(); err != nil {
+			return nil, err
+		}
 	}
 
 	tz := timezoneLookup.MemoryStorage(true, "assets/timezone")
@@ -95,7 +100,7 @@ func unzipShapeFiles() error {
 			return fmt.Errorf("%s: illegal file path", fpath)
 		}
 
-		if f.Name == "dist/combined-with-oceans.json" {
+		if f.Name == "combined-with-oceans.json" {
 			outPath := rawDatabasePath
 
 			outFile, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
@@ -120,7 +125,7 @@ func unzipShapeFiles() error {
 			return nil
 		}
 	}
-	return errors.New("Found no combined-with-oceans.json to unzip")
+	return errors.New("found no combined-with-oceans.json to unzip")
 }
 
 // DownloadFile will download a url to a local file.
@@ -196,5 +201,5 @@ func latestReleaseAssetUrl(repo string, userAgent string, assetName string) (str
 		}
 	}
 
-	return "", errors.New("No asset found")
+	return "", errors.New("no asset found")
 }

@@ -33,6 +33,8 @@ func main() {
 		os.Exit(0)
 	}
 
+	// TODO: add arg to force a reload of timezones
+
 	// build handlers for routes
 	tzHandler := handlers.TimezoneHandler(tzService, log)
 	statusHandler := handlers.StatusHandler()

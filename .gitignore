@@ -2,3 +2,12 @@ assets/*
 
 # binary
 tz-service
+
+# ide 
+.vscode
+
+# os 
+.DS_Store
+
+# debug
+__debug_bin
