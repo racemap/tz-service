@@ -4,10 +4,16 @@ on: [push]
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v1
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
 
       - name: build
         run: |
@@ -25,3 +31,66 @@ jobs:
           RESULT=$(curl "http://localhost:8080/api?lng=32.408843&lat=104.505033")
           [ "$RESULT" = "{\"name\":\"Asia/Shanghai\",\"id\":\"CST\",\"offset\":28800}" ]
           docker stop tz-service
+
+      - name: push to docker hub
+        run: |
+          echo ${{ secrets.DOCKER_PASS }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+          docker tag \
+            "racemap/tz-service:${GITHUB_RUN_NUMBER}" \
+            "racemap/tz-service:${{ steps.extract_branch.outputs.branch }}"
+          docker push "racemap/tz-service:${GITHUB_RUN_NUMBER}"
+          docker push "racemap/tz-service:${{ steps.extract_branch.outputs.branch }}"
+          if [ "${{ steps.extract_branch.outputs.branch }}" == "master" ]; then
+            docker tag \
+              "racemap/tz-service:${GITHUB_RUN_NUMBER}" \
+              "racemap/tz-service:latest"
+            docker push "racemap/tz-service:latest"
+          fi
+          docker logout
+
+  build_with_asset:
+    name: Build with assets
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: build
+        run: |
+          docker build --target app_with_assets -t "racemap/tz-service:${GITHUB_RUN_NUMBER}-assets" .
+
+      - name: local test
+        run: |
+          docker run \
+            --rm \
+            -d \
+            -p8080:8080 \
+            --name tz-service \
+            "racemap/tz-service:${GITHUB_RUN_NUMBER}"
+          sleep 30
+          RESULT=$(curl "http://localhost:8080/api?lng=32.408843&lat=104.505033")
+          [ "$RESULT" = "{\"name\":\"Asia/Shanghai\",\"id\":\"CST\",\"offset\":28800}" ]
+          docker stop tz-service
+
+      - name: push to docker hub
+        run: |
+          echo ${{ secrets.DOCKER_PASS }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+          docker tag \
+            "racemap/tz-service:${GITHUB_RUN_NUMBER}-assets" \
+            "racemap/tz-service:${{ steps.extract_branch.outputs.branch }}-assets"
+          docker push "racemap/tz-service:${GITHUB_RUN_NUMBER}-assets"
+          docker push "racemap/tz-service:${{ steps.extract_branch.outputs.branch }}-assets"
+          if [ "${{ steps.extract_branch.outputs.branch }}" == "master" ]; then
+            docker tag \
+              "racemap/tz-service:${GITHUB_RUN_NUMBER}-assets" \
+              "racemap/tz-service:latest-assets"
+            docker push "racemap/tz-service:latest-assets"
+          fi
+          docker logout
+
+      - name: build assets
