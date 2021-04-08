@@ -34,7 +34,7 @@ jobs:
 
       - name: Push to Docker Hub
         run: |
-          echo "${{ secrets.DOCKER_PASS }}" | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+          echo '${{ secrets.DOCKER_PASS }}' | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
           docker tag \
             "racemap/tz-service:${GITHUB_RUN_NUMBER}" \
             "racemap/tz-service:${{ steps.extract_branch.outputs.branch }}"
@@ -79,7 +79,7 @@ jobs:
 
       - name: Push to Docker Hub
         run: |
-          echo "${{ secrets.DOCKER_PASS }}" | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
+          echo '${{ secrets.DOCKER_PASS }}' | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
           docker tag \
             "racemap/tz-service:${GITHUB_RUN_NUMBER}-assets" \
             "racemap/tz-service:${{ steps.extract_branch.outputs.branch }}-assets"
