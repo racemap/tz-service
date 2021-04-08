@@ -12,3 +12,16 @@ jobs:
       - name: build
         run: |
           docker build --target app -t "racemap/tz-service:${GITHUB_RUN_NUMBER}" .
+
+      - name: local test
+        runs-on: |
+          docker run \
+            --rm \
+            -d \
+            -p8080:8080 \
+            --name tz-service \
+            "racemap/tz-service:${GITHUB_RUN_NUMBER}"
+          sleep 30
+          RESULT=$(curl "http://localhost:8080/api?lng=32.408843&lat=104.505033")
+          [ "$RESULT" = "{\"name\":\"Asia/Shanghai\",\"id\":\"CST\",\"offset\":28800}" ]
+          docker stop tz-service
