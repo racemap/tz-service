@@ -11,4 +11,4 @@ jobs:
 
       - name: build
         run: |
-          docker build --target app -t "racemap/tz-service:${{GITHUB_RUN_NUMBER}}" .
+          docker build --target app -t "racemap/tz-service:${{env.GITHUB_RUN_NUMBER}}" .
