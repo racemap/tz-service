@@ -92,5 +92,3 @@ jobs:
             docker push "racemap/tz-service:latest-assets"
           fi
           docker logout
-
-      - name: build assets
