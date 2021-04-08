@@ -8,6 +8,8 @@ import (
 	"racemap.com/tz-service/handlers"
 	"racemap.com/tz-service/logger"
 	"racemap.com/tz-service/timezones"
+
+	"os"
 )
 
 func main() {
@@ -25,6 +27,11 @@ func main() {
 	}
 	defer tzService.Close()
 	log.Info("Init Timezone Database")
+
+	if len(os.Args) > 1 && os.Args[1] == "init" {
+		log.Info("Init done")
+		os.Exit(0)
+	}
 
 	// build handlers for routes
 	tzHandler := handlers.TimezoneHandler(tzService, log)
