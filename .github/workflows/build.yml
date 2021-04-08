@@ -5,10 +5,12 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      RUN_ID: ${GITHUB_RUN_NUMBER}
 
     steps:
       - uses: actions/checkout@v1
 
       - name: build
         run: |
-          docker build --target app -t "racemap/tz-service:${{env.GITHUB_RUN_NUMBER}}" .
+          docker build --target app -t "racemap/tz-service:${RUN_ID}" .
