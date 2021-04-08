@@ -1,5 +1,5 @@
 # build stage
-FROM golang:alpine AS builder
+FROM golang:alpine3.13 AS builder
 
 # Install git + SSL ca certificates.
 # Git is required for fetching the dependencies.
@@ -20,7 +20,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 RUN /app/tz-service init
 
 # final stage
-FROM alpine:3.9 AS app
+FROM alpine:3.13 AS app
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /app/tz-service /app/
 COPY --from=builder /etc/ssl/certs/* /etc/ssl/certs/
