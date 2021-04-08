@@ -14,7 +14,7 @@ jobs:
           docker build --target app -t "racemap/tz-service:${GITHUB_RUN_NUMBER}" .
 
       - name: local test
-        runs-on: |
+        runs: |
           docker run \
             --rm \
             -d \
